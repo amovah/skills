@@ -19,7 +19,7 @@ Once installed the skills are available as `/amovah:batch-plan` and
 | `batch-plan` | Second pass over a finished implementation plan: derives the real code-level dependencies between tasks, groups them into concurrently-safe batches, and writes the dispatch table, batch sequence, and dependency edges back into the plan file. |
 | `batch-run` | Executes an annotated plan batch by batch. Every unblocked task is dispatched at once, each subagent in its own git worktree branched from a common base; the batch is reviewed as a whole, merged in order, and validated once. |
 
-## Workflow
+## Batch Workflow
 
 The two are a pair, run in order:
 
@@ -34,25 +34,6 @@ The two are a pair, run in order:
 machinery (task brief, report file, review loop, progress ledger) and replaces
 exactly one of its rules — the ban on dispatching implementation subagents in
 parallel.
-
-## Adding a skill
-
-Create `skills/<name>/SKILL.md` with YAML frontmatter:
-
-```markdown
----
-name: <name>
-description: Use when <the situation that should trigger this skill>.
----
-
-# <Title>
-
-...
-```
-
-`name` must match the folder name. Nothing else to register — skills under
-`skills/` are discovered by convention. Bump `version` in
-`.claude-plugin/plugin.json` when publishing.
 
 ## License
 
