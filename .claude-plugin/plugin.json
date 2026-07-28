@@ -1,0 +1,19 @@
+{
+  "name": "amovah",
+  "version": "0.1.0",
+  "description": "Personal Claude Code skills. Parallel plan annotation and batched worktree-isolated execution.",
+  "author": {
+    "name": "Ali Movahedi",
+    "url": "https://github.com/amovah"
+  },
+  "homepage": "https://github.com/amovah/skills",
+  "repository": "https://github.com/amovah/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "planning",
+    "parallel",
+    "worktree",
+    "subagents"
+  ]
+}

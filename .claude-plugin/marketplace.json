@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "amovah-skills",
+  "description": "Ali Movahedi's personal Claude Code skills.",
+  "owner": {
+    "name": "Ali Movahedi",
+    "url": "https://github.com/amovah"
+  },
+  "plugins": [
+    {
+      "name": "amovah",
+      "description": "Personal Claude Code skills. Parallel plan annotation and batched worktree-isolated execution.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
