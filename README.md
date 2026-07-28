@@ -18,6 +18,40 @@ that qualify.
 
 Skills then invoke as `/amovah:batch-plan` and `/amovah:batch-run`.
 
+### OpenAI Codex CLI
+
+Codex is the one agent that needs more than dropping the files in place —
+parallel subagent dispatch sits behind a feature flag, and `batch-run` has
+nothing to dispatch a batch to without it. The script does both halves:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh | sh
+```
+
+It links the skills into `~/.agents/skills/` and sets `multi_agent = true` under
+`[features]` in `~/.codex/config.toml`, preserving the rest of the file and
+backing it up to `config.toml.bak` first. Re-running updates rather than
+duplicating. Restart Codex afterwards.
+
+To read the script before running it — a good habit with any `curl | sh`:
+
+```sh
+curl -fsSL -O https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh
+less install-codex.sh
+sh install-codex.sh
+```
+
+Flags: `--config-only`, `--skills-only`, `--uninstall`, `--help`. Paths are
+overridable via `AMOVAH_SKILLS_DIR`, `CODEX_SKILLS_DIR`, and `CODEX_HOME`.
+
+Doing it by hand instead is two steps — clone and symlink as below, then add to
+`~/.codex/config.toml`:
+
+```toml
+[features]
+multi_agent = true
+```
+
 ### Every other agent — clone and symlink
 
 Most agents read the shared `~/.agents/skills/` directory, so one clone plus two
@@ -36,7 +70,7 @@ directory instead:
 | Agent | Global skills directory | Parallel subagents |
 |-------|------------------------|--------------------|
 | Claude Code | `~/.claude/skills/` (or install the plugin, above) | `Task` / `Agent` tool |
-| OpenAI Codex CLI | `~/.agents/skills/` | needs `[features] multi_agent = true` in `~/.codex/config.toml`, which enables `spawn_agent` / `wait_agent` / `close_agent` |
+| OpenAI Codex CLI | `~/.agents/skills/` | needs `[features] multi_agent = true` in `~/.codex/config.toml` (see above) — enables `spawn_agent` / `wait_agent` / `close_agent` |
 | Cursor (v2.4+) | `~/.cursor/skills/` or `~/.agents/skills/` | background / subagent dispatch |
 | Gemini CLI (v0.26.0+) | `~/.gemini/skills/` or `~/.agents/skills/` | `invoke_agent` with `agent_name: "generalist"` |
 | Google Antigravity | `~/.gemini/antigravity/global_skills/` | `invoke_subagent` |
