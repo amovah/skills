@@ -1,16 +1,66 @@
 # amovah/skills
 
-Personal [Claude Code](https://claude.com/claude-code) skills, packaged as a plugin.
+Personal agent skills in the portable `SKILL.md` format, packaged as a
+[Claude Code](https://claude.com/claude-code) plugin.
+
+Both skills need a host agent that can **dispatch subagents in parallel** and
+**run shell commands** (for `git worktree`). The table below covers the agents
+that qualify.
 
 ## Install
+
+### Claude Code
 
 ```
 /plugin marketplace add amovah/skills
 /plugin install amovah@amovah-skills
 ```
 
-Once installed the skills are available as `/amovah:batch-plan` and
-`/amovah:batch-run`.
+Skills then invoke as `/amovah:batch-plan` and `/amovah:batch-run`.
+
+### Every other agent — clone and symlink
+
+Most agents read the shared `~/.agents/skills/` directory, so one clone plus two
+symlinks covers Codex CLI, Cursor, Gemini CLI, opencode, and Amp at once:
+
+```bash
+git clone https://github.com/amovah/skills.git ~/.agent-skills/amovah
+mkdir -p ~/.agents/skills
+ln -s ~/.agent-skills/amovah/skills/batch-plan ~/.agents/skills/batch-plan
+ln -s ~/.agent-skills/amovah/skills/batch-run  ~/.agents/skills/batch-run
+```
+
+For an agent that does not read `~/.agents/skills/`, symlink into its own
+directory instead:
+
+| Agent | Global skills directory | Parallel subagents |
+|-------|------------------------|--------------------|
+| Claude Code | `~/.claude/skills/` (or install the plugin, above) | `Task` / `Agent` tool |
+| OpenAI Codex CLI | `~/.agents/skills/` | needs `[features] multi_agent = true` in `~/.codex/config.toml`, which enables `spawn_agent` / `wait_agent` / `close_agent` |
+| Cursor (v2.4+) | `~/.cursor/skills/` or `~/.agents/skills/` | background / subagent dispatch |
+| Gemini CLI (v0.26.0+) | `~/.gemini/skills/` or `~/.agents/skills/` | `invoke_agent` with `agent_name: "generalist"` |
+| Google Antigravity | `~/.gemini/antigravity/global_skills/` | `invoke_subagent` |
+| opencode | `~/.config/opencode/skills/` (also reads `~/.claude/skills/` and `~/.agents/skills/`) | subagents via the task tool |
+| Amp | `~/.config/agents/skills/` (also reads `~/.claude/skills/`) | subagent dispatch |
+
+Per-project instead of global: use the same layout under the project root —
+`.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.opencode/skills/`,
+or `<workspace>/.agent/skills/` for Antigravity.
+
+Outside Claude Code the skills are invoked by name — `batch-plan`, `batch-run` —
+without the `amovah:` prefix.
+
+### Worktree caveat
+
+`batch-run` creates worktrees itself with `git worktree add`, so the host needs
+shell access to a normal git checkout. Two environments break that:
+
+- **Sandboxed / externally managed worktrees** (the Codex app, some cloud
+  runners) can land the agent on a detached HEAD, where it cannot branch. Check
+  with `git branch --show-current`; if it is empty, run locally instead.
+- **Harness `isolation: "worktree"` flags** are not a substitute — `batch-run`
+  explicitly creates the worktrees itself, because agents dispatched with such a
+  flag have been observed running in the shared checkout anyway.
 
 ## Skills
 
