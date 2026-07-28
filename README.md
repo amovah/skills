@@ -22,16 +22,24 @@ Skills then invoke as `/amovah:batch-plan` and `/amovah:batch-run`.
 
 Codex is the one agent that needs more than dropping the files in place —
 parallel subagent dispatch sits behind a feature flag, and `batch-run` has
-nothing to dispatch a batch to without it. The script does both halves:
+nothing to dispatch a batch to without it. The script does the install *and* the
+config:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh | sh
 ```
 
-It links the skills into `~/.agents/skills/` and sets `multi_agent = true` under
-`[features]` in `~/.codex/config.toml`, preserving the rest of the file and
-backing it up to `config.toml.bak` first. Re-running updates rather than
-duplicating. Restart Codex afterwards.
+Three steps, in order:
+
+1. **Clones** this repo to `~/.local/share/amovah-skills` — or `git pull`s it if
+   the clone already exists.
+2. **Symlinks** `batch-plan` and `batch-run` into `~/.agents/skills/`, the shared
+   directory Codex reads. Symlinks rather than copies, so a later `git pull` in
+   the clone updates what Codex loads with no reinstall.
+3. **Sets** `multi_agent = true` under `[features]` in `~/.codex/config.toml`,
+   preserving the rest of the file and backing it up to `config.toml.bak` first.
+
+Re-running updates rather than duplicating. Restart Codex afterwards.
 
 To read the script before running it — a good habit with any `curl | sh`:
 
@@ -41,8 +49,18 @@ less install-codex.sh
 sh install-codex.sh
 ```
 
-Flags: `--config-only`, `--skills-only`, `--uninstall`, `--help`. Paths are
-overridable via `AMOVAH_SKILLS_DIR`, `CODEX_SKILLS_DIR`, and `CODEX_HOME`.
+To run only one half:
+
+| Command | Clone + symlink | Edit config |
+|---------|-----------------|-------------|
+| `sh install-codex.sh` | yes | yes |
+| `sh install-codex.sh --skills-only` | yes | no |
+| `sh install-codex.sh --config-only` | no | yes |
+
+`--config-only` never touches git or the network. Also `--uninstall` (removes
+the symlinks, leaves the feature flag — other skills may rely on it) and
+`--help`. Paths are overridable via `AMOVAH_SKILLS_DIR`, `CODEX_SKILLS_DIR`,
+and `CODEX_HOME`.
 
 Doing it by hand instead is two steps — clone and symlink as below, then add to
 `~/.codex/config.toml`:
