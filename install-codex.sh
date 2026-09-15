@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install the amovah skills (batch-plan, batch-run) for OpenAI Codex CLI.
+# Install the amovah skills (batch-plan, batch-run, discuss) for OpenAI Codex CLI.
 #
 #   curl -fsSL https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh | sh
 #
@@ -20,7 +20,7 @@
 set -eu
 
 REPO_URL="https://github.com/amovah/skills.git"
-SKILLS="batch-plan batch-run"
+SKILLS="batch-plan batch-run discuss"
 
 CLONE_DIR="${AMOVAH_SKILLS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/amovah-skills}"
 SKILLS_DIR="${CODEX_SKILLS_DIR:-$HOME/.agents/skills}"
@@ -37,7 +37,7 @@ die()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; exit 1; }
 
 usage() {
   cat <<'EOF'
-Install the amovah skills (batch-plan, batch-run) for OpenAI Codex CLI.
+Install the amovah skills (batch-plan, batch-run, discuss) for OpenAI Codex CLI.
 
   curl -fsSL https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh | sh
 
@@ -215,4 +215,4 @@ if [ "$DO_CONFIG" = 1 ]; then configure_codex; fi
 have codex || warn "codex CLI not found on PATH — install it to use the skills"
 
 printf '\n'
-ok "done — restart Codex, then ask it to use batch-plan or batch-run"
+ok "done — restart Codex, then ask it to use batch-plan, batch-run, or discuss"

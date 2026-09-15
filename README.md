@@ -3,8 +3,8 @@
 Personal agent skills in the portable `SKILL.md` format, packaged as a
 [Claude Code](https://claude.com/claude-code) plugin.
 
-Both skills need a host agent that can **dispatch subagents in parallel** and
-**run shell commands** (for `git worktree`). The table below covers the agents
+The batch skills need a host agent that can **dispatch subagents in parallel** and
+**run shell commands** (for `git worktree`); `discuss` runs anywhere. The table below covers the agents
 that qualify.
 
 ## Install
@@ -16,7 +16,7 @@ that qualify.
 /plugin install amovah@amovah-skills
 ```
 
-Skills then invoke as `/amovah:batch-plan` and `/amovah:batch-run`.
+Skills then invoke as `/amovah:batch-plan`, `/amovah:batch-run`, and `/amovah:discuss`.
 
 ### OpenAI Codex CLI
 
@@ -33,7 +33,7 @@ Three steps, in order:
 
 1. **Clones** this repo to `~/.local/share/amovah-skills` — or `git pull`s it if
    the clone already exists.
-2. **Symlinks** `batch-plan` and `batch-run` into `~/.agents/skills/`, the shared
+2. **Symlinks** `batch-plan`, `batch-run`, and `discuss` into `~/.agents/skills/`, the shared
    directory Codex reads. Symlinks rather than copies, so a later `git pull` in
    the clone updates what Codex loads with no reinstall.
 3. **Sets** `multi_agent = true` under `[features]` in `~/.codex/config.toml`,
@@ -72,14 +72,15 @@ multi_agent = true
 
 ### Every other agent — clone and symlink
 
-Most agents read the shared `~/.agents/skills/` directory, so one clone plus two
-symlinks covers Codex CLI, Cursor, Gemini CLI, opencode, and Amp at once:
+Most agents read the shared `~/.agents/skills/` directory, so one clone plus a
+symlink per skill covers Codex CLI, Cursor, Gemini CLI, opencode, and Amp at once:
 
 ```bash
 git clone https://github.com/amovah/skills.git ~/.agent-skills/amovah
 mkdir -p ~/.agents/skills
 ln -s ~/.agent-skills/amovah/skills/batch-plan ~/.agents/skills/batch-plan
 ln -s ~/.agent-skills/amovah/skills/batch-run  ~/.agents/skills/batch-run
+ln -s ~/.agent-skills/amovah/skills/discuss    ~/.agents/skills/discuss
 ```
 
 For an agent that does not read `~/.agents/skills/`, symlink into its own
@@ -99,7 +100,7 @@ Per-project instead of global: use the same layout under the project root —
 `.agents/skills/`, `.claude/skills/`, `.cursor/skills/`, `.opencode/skills/`,
 or `<workspace>/.agent/skills/` for Antigravity.
 
-Outside Claude Code the skills are invoked by name — `batch-plan`, `batch-run` —
+Outside Claude Code the skills are invoked by name — `batch-plan`, `batch-run`, `discuss` —
 without the `amovah:` prefix.
 
 ### Worktree caveat
@@ -120,6 +121,7 @@ shell access to a normal git checkout. Two environments break that:
 |-------|--------------|
 | `batch-plan` | Second pass over a finished implementation plan: derives the real code-level dependencies between tasks, groups them into concurrently-safe batches, and writes the dispatch table, batch sequence, and dependency edges back into the plan file. |
 | `batch-run` | Executes an annotated plan batch by batch. Every unblocked task is dispatched at once, each subagent in its own git worktree branched from a common base; the batch is reviewed as a whole, merged in order, and validated once. |
+| `discuss` | Slash-command only. Switches into plan mode for a discussion-first session — explores the code, answers questions, weighs approaches — and writes no plan until you explicitly ask for one. |
 
 ## Batch Workflow
 
