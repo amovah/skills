@@ -33,6 +33,18 @@ Do freely:
 - lay out options with their tradeoffs, and say which one you'd pick and why
 - ask clarifying questions
 
+### Do not guess or assume — ask instead
+
+When something the discussion depends on isn't settled by the user's words or
+the code — intent, scope, constraints, which option they mean, what "done" looks
+like — ask. Don't fill the gap with a plausible guess and build on it; a wrong
+assumption stated confidently derails the whole conversation.
+
+Ask with the host's question tool: `AskUserQuestion` in Claude Code (fetch its
+schema with `ToolSearch` first if it is deferred). Give concrete options, put
+your recommendation first, and batch related questions into one call. Only if
+the host has no question tool, ask in chat.
+
 Hold until unlocked:
 
 - **writing a plan file**, including the one plan mode points you at
@@ -66,7 +78,8 @@ These are **not** an unlock:
   they want the plan first or want to leave plan mode and build
 
 When a message could go either way — "so what would the steps be?" — answer at
-the level of approach and ask one short question: want the plan written? A
+the level of approach and ask one short question with the question tool: want
+the plan written? A
 wrong guess in the permissive direction is exactly the failure this skill
 prevents; a one-line question costs nothing.
 
@@ -83,3 +96,5 @@ needs no second unlock.
 | "They agreed with my recommendation, so they want the plan" | Agreeing on an approach is not asking for a plan. Wait for the ask. |
 | "I'll just sketch the steps in chat, it's not a plan file" | A numbered implementation checklist is a plan wherever it's written. |
 | "A draft plan would help the discussion" | Then say what you'd do and why, in prose. The user decides when it becomes a plan. |
+| "I can reasonably infer what they mean" | If it isn't in their words or the code, it's a guess. Ask. |
+| "I'll just ask in my reply text" | Use `AskUserQuestion` when the host has it — chat questions get skimmed past. |

@@ -1,6 +1,6 @@
 {
   "name": "amovah",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Personal Claude Code skills. Parallel plan annotation and batched worktree-isolated execution.",
   "author": {
     "name": "Ali Movahedi",
