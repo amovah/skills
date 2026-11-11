@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "amovah",
-      "description": "Personal Claude Code skills. Parallel plan annotation and batched worktree-isolated execution.",
+      "description": "Personal Claude Code skills.",
       "source": "./",
       "category": "productivity"
     }

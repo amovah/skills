@@ -1,12 +1,11 @@
 #!/bin/sh
-# Install the amovah skills (batch-plan, batch-run, discuss) for OpenAI Codex CLI.
+# Install the amovah skills for OpenAI Codex CLI.
 #
 #   curl -fsSL https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh | sh
 #
 # Codex is the only supported agent that needs configuration beyond dropping the
-# skill files in place: parallel subagent dispatch sits behind a feature flag,
-# and without it batch-run has nothing to dispatch a batch to. This script does
-# both halves — links the skills into ~/.agents/skills and sets
+# skill files in place: parallel subagent dispatch sits behind a feature flag.
+# This script does both halves — links the skills into ~/.agents/skills and sets
 # multi_agent = true in ~/.codex/config.toml.
 #
 # Safe to re-run. The config file is backed up before any edit.
@@ -20,7 +19,6 @@
 set -eu
 
 REPO_URL="https://github.com/amovah/skills.git"
-SKILLS="batch-plan batch-run discuss"
 
 CLONE_DIR="${AMOVAH_SKILLS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/amovah-skills}"
 SKILLS_DIR="${CODEX_SKILLS_DIR:-$HOME/.agents/skills}"
@@ -37,13 +35,12 @@ die()  { printf '\033[31m✗\033[0m %s\n' "$*" >&2; exit 1; }
 
 usage() {
   cat <<'EOF'
-Install the amovah skills (batch-plan, batch-run, discuss) for OpenAI Codex CLI.
+Install the amovah skills for OpenAI Codex CLI.
 
   curl -fsSL https://raw.githubusercontent.com/amovah/skills/master/install-codex.sh | sh
 
 Links the skills into ~/.agents/skills and sets multi_agent = true in
-~/.codex/config.toml, which is what enables the parallel subagent dispatch
-batch-run needs. Safe to re-run; the config file is backed up before any edit.
+~/.codex/config.toml, which enables parallel subagent dispatch. Safe to re-run; the config file is backed up before any edit.
 
 Flags:
   --config-only   only set the feature flag, do not install skills
@@ -71,6 +68,14 @@ done
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+# Every directory under skills/ in the clone is a skill.
+list_skills() {
+  [ -d "$CLONE_DIR/skills" ] || return 0
+  for d in "$CLONE_DIR"/skills/*/; do
+    [ -d "$d" ] && basename "$d"
+  done
+}
+
 # --------------------------------------------------------------------- skills
 
 clone_or_update() {
@@ -88,6 +93,9 @@ install_skills() {
   have git || die "git is required to install the skills"
   clone_or_update
   mkdir -p "$SKILLS_DIR"
+
+  SKILLS=$(list_skills)
+  [ -n "$SKILLS" ] || { warn "no skills found in $CLONE_DIR/skills"; return 0; }
 
   for skill in $SKILLS; do
     target="$CLONE_DIR/skills/$skill"
@@ -110,7 +118,7 @@ install_skills() {
 }
 
 uninstall_skills() {
-  for skill in $SKILLS; do
+  for skill in $(list_skills); do
     link="$SKILLS_DIR/$skill"
     if [ -L "$link" ]; then
       rm "$link"
@@ -215,4 +223,4 @@ if [ "$DO_CONFIG" = 1 ]; then configure_codex; fi
 have codex || warn "codex CLI not found on PATH — install it to use the skills"
 
 printf '\n'
-ok "done — restart Codex, then ask it to use batch-plan, batch-run, or discuss"
+ok "done — restart Codex, then ask it to use one of the skills"
